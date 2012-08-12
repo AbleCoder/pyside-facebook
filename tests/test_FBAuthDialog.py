@@ -6,7 +6,26 @@ from PySide.QtGui import QWidget
 
 from pyside_facebook import DEFAULT_REDIRECT_URI
 from pyside_facebook import FBAuthDialog
+from pyside_facebook import OAUTH_URL
 
+
+# -------------------------------------------------------------------------
+# CONSTANTS
+# -------------------------------------------------------------------------
+
+DEFAULT_OAUTH_PARAMS = {
+    "app_id": None,
+    "redirect_uri": DEFAULT_REDIRECT_URI,
+    "scope": [],
+    "state": None,
+    "response_type": "token",
+    "display": "page",
+}
+
+
+# -----------------------------------------------------------------------------
+# TEST CASES
+# -----------------------------------------------------------------------------
 
 class FBAuthDialogTestCase(unittest.TestCase):
 
@@ -61,33 +80,44 @@ class FBAuthDialogTestCase(unittest.TestCase):
     def test__instantiation(self):
         parentWidget = FBAuthDialogTestCase.parentWidget
 
-        # create widget without parent or app_id
-        self.fbAuthWidget = FBAuthDialog()
+        # test widget without parent or app_id
+        fbAuthWidget = FBAuthDialog()
 
-        self.assertIsNone(self.fbAuthWidget.parentWidget())
-        self.assertIsNone(self.fbAuthWidget.oauth_kwargs['app_id'])
-        self.helper_test_oauth_params(self.fbAuthWidget.oauth_kwargs)
+        self.assertIsNone(fbAuthWidget.parentWidget())
+        self.assertIsNone(fbAuthWidget.oauth_params['app_id'])
+        self.helper_test_oauth_params(fbAuthWidget.oauth_params)
 
-        self.fbAuthWidget.destroy(True, True)
-        self.fbAuthWidget = None
+        fbAuthWidget.destroy(True, True)
+        fbAuthWidget = None
 
-        # create widget with only parent and no app_id
-        self.fbAuthWidget = FBAuthDialog(parentWidget)
+        # test widget with only parent and no app_id
+        fbAuthWidget = FBAuthDialog(parentWidget)
 
-        self.assertIs(parentWidget, self.fbAuthWidget.parentWidget())
-        self.assertIsNone(self.fbAuthWidget.oauth_kwargs['app_id'])
+        self.assertIs(parentWidget, fbAuthWidget.parentWidget())
+        self.assertIsNone(fbAuthWidget.oauth_params['app_id'])
 
-        self.fbAuthWidget.destroy(True, True)
-        self.fbAuthWidget = None
+        fbAuthWidget.destroy(True, True)
+        fbAuthWidget = None
 
-        # create widget with parent and app_id
-        self.fbAuthWidget = FBAuthDialog(parentWidget, "12345")
+        # test widget with parent and app_id
+        fbAuthWidget = FBAuthDialog(parentWidget, "12345")
 
-        self.assertIs(parentWidget, self.fbAuthWidget.parentWidget())
-        self.assertEqual("12345", self.fbAuthWidget.oauth_kwargs['app_id'])
+        self.assertIs(parentWidget, fbAuthWidget.parentWidget())
+        self.assertEqual("12345", fbAuthWidget.oauth_params['app_id'])
 
-        self.fbAuthWidget.destroy(True, True)
-        self.fbAuthWidget = None
+        fbAuthWidget.destroy(True, True)
+        fbAuthWidget = None
+
+    # -------------------------------------------------------------------------
+
+    def test_oauth_url(self):
+        # setup widget to run tests on
+        fbAuthWidget = FBAuthDialog(FBAuthDialogTestCase.parentWidget)
+
+        self.assertEqual(DEFAULT_OAUTH_PARAMS, fbAuthWidget.oauth_params)
+
+
+
 
     """
     def test_default_size(self):

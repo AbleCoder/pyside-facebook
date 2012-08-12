@@ -129,18 +129,25 @@ class FBAuthDialog(QWebView):
         """
         Return encoded OAuth URL with request params formated as GET params.
 
-        @return (QByteArray)
+        @param (str)  app_id
+        @param (str)  redirect_uri
+        @param (list) scope
+        @param (str)  state
+        @param (str)  response_type
+        @param (str)  display
         """
 
         url = QUrl(OAUTH_URL)
 
-        url.addQueryItem("client_id", unicode(app_id))
-        url.addQueryItem("redirect_uri", unicode(redirect_uri))
-        url.addQueryItem("response_type", unicode(response_type))
-        url.addQueryItem("display", unicode(display))
+        url.addQueryItem("client_id", app_id)
+        url.addQueryItem("redirect_uri", redirect_uri)
+        url.addQueryItem("response_type", response_type)
+        url.addQueryItem("display", display)
 
         if scope:
-            url.addQueryItem("scope", scope)
+            _scope = ",".join(map(unicode, scope))
+
+            url.addQueryItem("scope", _scope)
 
         if state:
             url.addQueryItem("state", state)
@@ -168,7 +175,7 @@ class FBAuthDialog(QWebView):
         @param (str)  [display]
         """
 
-        self.oauth_kwargs = {
+        self.oauth_params = {
             "app_id": app_id,
             "redirect_uri": DEFAULT_REDIRECT_URI,
             "scope": scope,
