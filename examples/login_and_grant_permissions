@@ -34,12 +34,12 @@ class MainWindow(QWidget):
         self.resize(500, 300)
         self.setWindowTitle('Log In & Grant Permissions')
 
+        self.fb_auth = FBAuthDialog(self)
+
         self.grant_button = QPushButton('Grant Facebook Permissions!', self)
         self.grant_button.resize(self.size())
         self.grant_button.clicked.connect(self.grant_perms)
         self.grant_button.show()
-
-        self.fb_auth = FBAuthDialog(self)
 
     def grant_perms(self):
         print "This is where the facebook login should begin"

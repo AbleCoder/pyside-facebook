@@ -88,7 +88,7 @@ class FBAuthDialog(QWebView):
         @return (QByteArray)
         """
 
-        url = QUrl(FBAuthDialog.OAUTH_URL)
+        url = QUrl(OAUTH_URL)
         print "~~>>", url
 
         url.addQueryItem(u"client_id", unicode(client_id))
