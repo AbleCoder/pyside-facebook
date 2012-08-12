@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+#
+# This file is part of PySide-Facebook.
+# Copyright (c) 2012 Brandon Orther. All rights reserved.
+#
+# The full license is available in the LICENSE file that was distributed with
+# this source code.
+#
+# Author: Brandon Orther <an.able.coder@gmail.com>
+
+"""A barebones PySide application that authenticates a Facebook user and
+grants permissions to post access a user's primary email address.
+"""
+
+
+FACEBOOK_APP_ID = "your app id"
+FACEBOOK_APP_SECRET = "your app secret"
+
+
+import sys
+#from PySide.QtCore import *
+from PySide.QtGui import QApplication
+from PySide.QtGui import QPushButton
+from PySide.QtGui import QWidget
+#from PySide.QtWebKit import QWebView
+
+from pyside_facebook import FBAuthDialog
+
+
+class MainWindow(QWidget):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+
+        self.resize(500, 300)
+        self.setWindowTitle('Log In & Grant Permissions')
+
+        self.grant_button = QPushButton('Grant Facebook Permissions!', self)
+        self.grant_button.resize(self.size())
+        self.grant_button.clicked.connect(self.grant_perms)
+        self.grant_button.show()
+
+        self.fb_auth = FBAuthDialog(self)
+
+    def grant_perms(self):
+        print "This is where the facebook login should begin"
+        print 434, FACEBOOK_APP_ID
+        print 545, self.fb_auth.oauth_url(FACEBOOK_APP_ID)
+
+    def tempCameraCapture(self):
+        """
+        Render web camera preview to screen.
+        """
+
+        print "Do camera stuff!"
+        """
+        camera = new QCamera;
+        viewFinder = new QCameraViewfinder;
+        camera->setViewfinder(viewFinder);
+        viewFinder->show();
+        """
+
+
+def main():
+    app = QApplication(sys.argv)
+
+    window = MainWindow()
+    window.show()
+
+    sys.exit(app.exec_())
+
+
+if __name__ == '__main__':
+    main()
