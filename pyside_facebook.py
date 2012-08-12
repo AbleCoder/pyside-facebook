@@ -41,7 +41,14 @@ class FBAuthDialogException(PySideFacebookException):
 
 # -----------------------------------------------------------------------------
 
-class FBGraphAPI(PySideFacebookException):
+class FBAuthDialogInvalidParamException(FBAuthDialogException):
+
+    pass
+
+
+# -----------------------------------------------------------------------------
+
+class FBGraphAPIException(PySideFacebookException):
 
     pass
 
@@ -129,13 +136,42 @@ class FBAuthDialog(QWebView):
         """
         Return encoded OAuth URL with request params formated as GET params.
 
-        @param (str)  app_id
-        @param (str)  redirect_uri
-        @param (list) scope
-        @param (str)  state
-        @param (str)  response_type
-        @param (str)  display
+        @param (str/uni) app_id
+        @param (str/uni) redirect_uri
+        @param (list)    scope
+        @param (str/uni) state
+        @param (str/uni) response_type
+        @param (str/uni) display
         """
+
+        if type(app_id) not in (str, unicode):
+            raise FBAuthDialogInvalidParamException(
+                "app_id must be `str` or `unicode` but was: %s" % type(app_id))
+
+        if type(redirect_uri) not in (type(None), str, unicode):
+            raise FBAuthDialogInvalidParamException(
+                "redirect_uri must be `None`, `str` or `unicode` but was: %s" %
+                type(redirect_uri))
+
+        if type(scope) not in (type(None), list):
+            raise FBAuthDialogInvalidParamException(
+                "scope must be `None` or `list` but was: %s" %
+                type(scope))
+
+        if type(state) not in (type(None), str, unicode):
+            raise FBAuthDialogInvalidParamException(
+                "state must be `None`, `str` or `unicode` but was: %s" %
+                type(state))
+
+        if type(response_type) not in (type(None), str, unicode):
+            raise FBAuthDialogInvalidParamException(
+                "response_type must be `None`, `str` or `unicode` but was: %s"
+                % type(response_type))
+
+        if type(display) not in (type(None), str, unicode):
+            raise FBAuthDialogInvalidParamException(
+                "display must be `None`, `str` or `unicode` but was: %s"
+                % type(display))
 
         url = QUrl(OAUTH_URL)
 
@@ -167,12 +203,12 @@ class FBAuthDialog(QWebView):
         Facebook Permissions Reference
          - https://developers.facebook.com/docs/authentication/permissions/
 
-        @param (str)  [app_id]
-        @param (str)  [redirect_uri]
-        @param (list) [scope]         A list of permissions
-        @param (str)  [state]
-        @param (str)  [response_type]
-        @param (str)  [display]
+        @param (str/uni) [app_id]
+        @param (str/uni) [redirect_uri]
+        @param (list)    [scope]         A list of permissions
+        @param (str/uni) [state]
+        @param (str/uni) [response_type]
+        @param (str/uni) [display]
         """
 
         self.oauth_params = {

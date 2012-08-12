@@ -6,6 +6,7 @@ from PySide.QtGui import QWidget
 
 from pyside_facebook import DEFAULT_REDIRECT_URI
 from pyside_facebook import FBAuthDialog
+from pyside_facebook import FBAuthDialogInvalidParamException
 from pyside_facebook import OAUTH_URL
 
 
@@ -81,40 +82,100 @@ class FBAuthDialogTestCase(unittest.TestCase):
         parentWidget = FBAuthDialogTestCase.parentWidget
 
         # test widget without parent or app_id
-        fbAuthWidget = FBAuthDialog()
+        fbad = FBAuthDialog()
 
-        self.assertIsNone(fbAuthWidget.parentWidget())
-        self.assertIsNone(fbAuthWidget.oauth_params['app_id'])
-        self.helper_test_oauth_params(fbAuthWidget.oauth_params)
+        self.assertIsNone(fbad.parentWidget())
+        self.assertIsNone(fbad.oauth_params['app_id'])
+        self.helper_test_oauth_params(fbad.oauth_params)
 
-        fbAuthWidget.destroy(True, True)
-        fbAuthWidget = None
+        fbad.destroy(True, True)
+        fbad = None
 
         # test widget with only parent and no app_id
-        fbAuthWidget = FBAuthDialog(parentWidget)
+        fbad = FBAuthDialog(parentWidget)
 
-        self.assertIs(parentWidget, fbAuthWidget.parentWidget())
-        self.assertIsNone(fbAuthWidget.oauth_params['app_id'])
+        self.assertIs(parentWidget, fbad.parentWidget())
+        self.assertIsNone(fbad.oauth_params['app_id'])
 
-        fbAuthWidget.destroy(True, True)
-        fbAuthWidget = None
+        fbad.destroy(True, True)
+        fbad = None
 
         # test widget with parent and app_id
-        fbAuthWidget = FBAuthDialog(parentWidget, "12345")
+        fbad = FBAuthDialog(parentWidget, "12345")
 
-        self.assertIs(parentWidget, fbAuthWidget.parentWidget())
-        self.assertEqual("12345", fbAuthWidget.oauth_params['app_id'])
+        self.assertIs(parentWidget, fbad.parentWidget())
+        self.assertEqual("12345", fbad.oauth_params['app_id'])
 
-        fbAuthWidget.destroy(True, True)
-        fbAuthWidget = None
+        fbad.destroy(True, True)
+        fbad = None
 
     # -------------------------------------------------------------------------
 
     def test_oauth_url(self):
         # setup widget to run tests on
-        fbAuthWidget = FBAuthDialog(FBAuthDialogTestCase.parentWidget)
+        fbad = FBAuthDialog(FBAuthDialogTestCase.parentWidget)
 
-        self.assertEqual(DEFAULT_OAUTH_PARAMS, fbAuthWidget.oauth_params)
+        # test default oauth_params WITH OUT app_id
+        oauth_params = DEFAULT_OAUTH_PARAMS.copy()
+
+        with self.assertRaises(FBAuthDialogInvalidParamException):
+            fbad.oauth_url(**oauth_params)
+
+        # test default oauth_params
+        oauth_params = DEFAULT_OAUTH_PARAMS.copy()
+        oauth_params['app_id'] = "TEST_APP_ID"
+
+        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
+            "client_id=TEST_APP_ID",
+            "redirect_uri=http://www.facebook.com/connect/login_success.html",
+            "response_type=token",
+            "display=page"]))
+
+        self.assertEqual(test_oauth_url, fbad_oauth_url)
+
+        # test default oauth_params w/ scope
+        oauth_params = DEFAULT_OAUTH_PARAMS.copy()
+        oauth_params['app_id'] = "TEST_APP_ID"
+        oauth_params['scope'] = ["test_perm1", "test_permABC"]
+
+        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
+            "client_id=TEST_APP_ID",
+            "redirect_uri=http://www.facebook.com/connect/login_success.html",
+            "response_type=token",
+            "display=page",
+            "scope=test_perm1,test_permABC"]))
+
+        # test default oauth_params w/ state
+        oauth_params = DEFAULT_OAUTH_PARAMS.copy()
+        oauth_params['app_id'] = "TEST_APP_ID"
+        oauth_params['state'] = "test_state"
+
+        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
+            "client_id=TEST_APP_ID",
+            "redirect_uri=http://www.facebook.com/connect/login_success.html",
+            "response_type=token",
+            "display=page",
+            "state=test_state"]))
+
+        # test default oauth_params w/ scope and state
+        oauth_params = DEFAULT_OAUTH_PARAMS.copy()
+        oauth_params['app_id'] = "TEST_APP_ID"
+        oauth_params['scope'] = ["test_perm1", "test_permABC"]
+        oauth_params['state'] = "test_state"
+
+        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
+            "client_id=TEST_APP_ID",
+            "redirect_uri=http://www.facebook.com/connect/login_success.html",
+            "response_type=token",
+            "display=page",
+            "scope=test_perm1,test_permABC",
+            "state=test_state"]))
+
+        self.assertEqual(test_oauth_url, fbad_oauth_url)
 
 
 
