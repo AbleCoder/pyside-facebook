@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # This file is part of PySide-Facebook.
 # Copyright (c) 2012 Brandon Orther. All rights reserved.
 #
