@@ -129,6 +129,25 @@ class FBAuthDialog(QWebView):
 
         self.set_oauth_params(app_id=app_id)
 
+        # connect signals
+        self.urlChanged.connect(self._slot_urlChanged)
+
+
+    # -------------------------------------------------------------------------
+    # INTERNAL METHODS
+    # -------------------------------------------------------------------------
+
+    def _slot_urlChanged(self, url):
+        """
+        Slot for QWebView urlChanged signal.
+
+        @param url (QUrl)
+        """
+
+        print "_slot_urlChanged", [url, str(url)]
+
+    # -------------------------------------------------------------------------
+    # PUBLIC METHODS
     # -------------------------------------------------------------------------
 
     def oauth_url(self, app_id, redirect_uri, scope, state, response_type,
