@@ -136,12 +136,12 @@ class FBAuthDialogTestCase(unittest.TestCase):
 
         # test default oauth_params w/ scope
         oauth_params = DEFAULT_OAUTH_PARAMS.copy()
-        oauth_params['app_id'] = "TEST_APP_ID"
+        oauth_params['app_id'] = "TEST_APP_ID-1"
         oauth_params['scope'] = ["test_perm1", "test_permABC"]
 
         fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
-            "client_id=TEST_APP_ID",
+            "client_id=TEST_APP_ID-1",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
             "display=page",
@@ -149,12 +149,12 @@ class FBAuthDialogTestCase(unittest.TestCase):
 
         # test default oauth_params w/ state
         oauth_params = DEFAULT_OAUTH_PARAMS.copy()
-        oauth_params['app_id'] = "TEST_APP_ID"
+        oauth_params['app_id'] = "TEST_APP_ID-2"
         oauth_params['state'] = "test_state"
 
         fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
-            "client_id=TEST_APP_ID",
+            "client_id=TEST_APP_ID-2",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
             "display=page",
@@ -162,13 +162,13 @@ class FBAuthDialogTestCase(unittest.TestCase):
 
         # test default oauth_params w/ scope and state
         oauth_params = DEFAULT_OAUTH_PARAMS.copy()
-        oauth_params['app_id'] = "TEST_APP_ID"
+        oauth_params['app_id'] = "TEST_APP_ID-3"
         oauth_params['scope'] = ["test_perm1", "test_permABC"]
         oauth_params['state'] = "test_state"
 
         fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
-            "client_id=TEST_APP_ID",
+            "client_id=TEST_APP_ID-3",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
             "display=page",
@@ -176,20 +176,6 @@ class FBAuthDialogTestCase(unittest.TestCase):
             "state=test_state"]))
 
         self.assertEqual(test_oauth_url, fbad_oauth_url)
-
-
-
-
-    """
-    def test_default_size(self):
-        self.assertEqual(self.widget.size(), (50,50),
-                         'incorrect default size')
-
-    def test_resize(self):
-        self.widget.resize(100,150)
-        self.assertEqual(self.widget.size(), (100,150),
-                         'wrong size after resize')
-    """
 
 if __name__ == '__main__':
     unittest.main()
