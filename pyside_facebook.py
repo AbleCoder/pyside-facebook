@@ -26,14 +26,38 @@ OAUTH_URL = "https://graph.facebook.com/oauth/authorize"
 
 
 # -----------------------------------------------------------------------------
+# EXCEPTIONS
+# -----------------------------------------------------------------------------
+
+class PySideFacebookException(Exception):
+
+    pass
+
+
+# -----------------------------------------------------------------------------
+
+class FBAuthDialogException(PySideFacebookException):
+
+    pass
+
+
+# -----------------------------------------------------------------------------
+
+class FBGraphAPI(PySideFacebookException):
+
+    pass
+
+
+# -----------------------------------------------------------------------------
 # CLASSES
 # -----------------------------------------------------------------------------
 
 class FBAuthDialog(QWebView):
+
     """
     A QWebView extended to load Facebook's OAuth Dialog allowing a user to
-    login and grant permissions to your facebook app and return the
-    user's token.
+    login and grant permissions to your facebook app and finally return the
+    user's token or OAuth code.
     """
 
     # -------------------------------------------------------------------------
@@ -74,27 +98,48 @@ class FBAuthDialog(QWebView):
     signal_permsDeclined = Signal(str, str, str, str)
 
     # -------------------------------------------------------------------------
+
+    """
+    Emitted when a user doesn't authenticate within the amount of time
+    specified in `user_auth_timeout`.
+
+    @param (int) time_elapsed - Number of seconds elapsed to cause the
+                                timeout.
+    """
+    signal_userAuthTimeout = Signal(int)
+
+    # -------------------------------------------------------------------------
     # METHODS
     # -------------------------------------------------------------------------
 
-    def __init__(self, parent):
+    def __init__(self, parent=None, app_id=None):
+        """
+        Instantiate FBAuthDialog object.
+
+        @param (QWidget) [parent] Parent object that this widget belongs to.
+        @param (str)     [app_id] Facebook App ID
+        """
+
         super(FBAuthDialog, self).__init__(parent)
 
-    def oauth_url(client_id, redirect_uri=DEFAULT_REDIRECT_URI, scope=None,
-            state=None, response_type="token", display="page"):
+        self.set_oauth_params(app_id=app_id)
+
+    # -------------------------------------------------------------------------
+
+    def oauth_url(self, app_id, redirect_uri, scope, state, response_type,
+            display):
         """
-        Return encoded OAuth URL.
+        Return encoded OAuth URL with request params formated as GET params.
 
         @return (QByteArray)
         """
 
         url = QUrl(OAUTH_URL)
-        print "~~>>", url
 
-        url.addQueryItem(u"client_id", unicode(client_id))
-        url.addQueryItem(u"redirect_uri", unicode(redirect_uri))
-        url.addQueryItem(u"response_type", unicode(response_type))
-        url.addQueryItem(u"display", unicode(display))
+        url.addQueryItem("client_id", unicode(app_id))
+        url.addQueryItem("redirect_uri", unicode(redirect_uri))
+        url.addQueryItem("response_type", unicode(response_type))
+        url.addQueryItem("display", unicode(display))
 
         if scope:
             url.addQueryItem("scope", scope)
@@ -103,3 +148,41 @@ class FBAuthDialog(QWebView):
             url.addQueryItem("state", state)
 
         return url.toEncoded()
+
+    # -------------------------------------------------------------------------
+
+    def set_oauth_params(self, app_id=None, redirect_uri=DEFAULT_REDIRECT_URI,
+            scope=[], state=None, response_type="token", display="page"):
+        """
+        Set QAuth request params values.
+
+        Facebook OAuth Dialog Param References:
+         - https://developers.facebook.com/docs/reference/dialogs/oauth/
+
+        Facebook Permissions Reference
+         - https://developers.facebook.com/docs/authentication/permissions/
+
+        @param (str)  [app_id]
+        @param (str)  [redirect_uri]
+        @param (list) [scope]         A list of permissions
+        @param (str)  [state]
+        @param (str)  [response_type]
+        @param (str)  [display]
+        """
+
+        self.oauth_kwargs = {
+            "app_id": app_id,
+            "redirect_uri": DEFAULT_REDIRECT_URI,
+            "scope": scope,
+            "state": state,
+            "response_type": response_type,
+            "display": display,
+        }
+
+    # -------------------------------------------------------------------------
+
+    def startAuth(self):
+        """
+        Start authentication process by opening OAuth Dialog view.
+        """
+        print "START THE AU6TH!!!"
