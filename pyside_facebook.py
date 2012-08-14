@@ -148,7 +148,7 @@ class FBAuthDialog(QWebView):
         @param url (QUrl)
         """
 
-        print "_slot_urlChanged", [url, str(url)]
+        print "_slot_urlChanged", url
 
     # -------------------------------------------------------------------------
     # PUBLIC METHODS
@@ -166,7 +166,7 @@ class FBAuthDialog(QWebView):
         @param response_type (str/uni)
         @param display       (str/uni)
 
-        @return (QByteArray)
+        @return (QUrl)
         """
 
         if type(app_id) not in (str, unicode):
@@ -213,12 +213,12 @@ class FBAuthDialog(QWebView):
         if state:
             url.addQueryItem("state", state)
 
-        return url.toEncoded()
+        return url
 
     # -------------------------------------------------------------------------
 
     def set_oauth_params(self, app_id=None, redirect_uri=REDIRECT_URI,
-            scope=[], state=None, response_type="token", display="page"):
+            scope=[], state=None, response_type="token", display="popup"):
         """
         Set QAuth request params values.
 
