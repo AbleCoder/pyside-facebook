@@ -70,6 +70,27 @@ class FBAuthDialog(QWebView):
     # -------------------------------------------------------------------------
 
     """
+    Emitted when a user authentication fails. This is when a user submits the
+    bad login details.
+
+    @param state (str) The state value originally set in request.
+    """
+
+    signal_authFail = Signal(str)
+
+    # -------------------------------------------------------------------------
+
+    """
+    Emitted when the auth form has loaded and is ready to be displayed.
+
+    @param state (str) The state value originally set in request.
+    """
+
+    signal_authFormReady = Signal(str)
+
+    # -------------------------------------------------------------------------
+
+    """
     Emitted when a user authenticates, authorizes the requested permissions
     AND the `response_type` was set to: token
 
@@ -95,8 +116,9 @@ class FBAuthDialog(QWebView):
     # -------------------------------------------------------------------------
 
     """
-    Emitted when a the requested permissions are NOT authorized (declined) by
-    the user.
+    Emitted when a the requested permissions are NOT authorized by the user.
+    This happens when a user clicks "cancel" at any time before authorizing
+    the permissions.
 
     @param error       (str) Error code (example: access_denied)
     @param reason      (str) Reason code (example: user_denied)
@@ -104,7 +126,7 @@ class FBAuthDialog(QWebView):
     @param state       (str) The state value originally set in request.
     """
 
-    signal_permsDeclined = Signal(str, str, str, str)
+    signal_permsNotAuthorized = Signal(str, str, str, str)
 
     # -------------------------------------------------------------------------
 
@@ -131,11 +153,14 @@ class FBAuthDialog(QWebView):
 
         super(FBAuthDialog, self).__init__(parent)
 
+        # set default oauth params
         self.set_oauth_params(app_id=app_id)
+
+        # calling the page() method makes DOM elements render correctly
+        self.page()
 
         # connect signals
         self.urlChanged.connect(self._slot_urlChanged)
-
 
     # -------------------------------------------------------------------------
     # INTERNAL METHODS
@@ -148,7 +173,59 @@ class FBAuthDialog(QWebView):
         @param url (QUrl)
         """
 
-        print "_slot_urlChanged", url
+        # ---------------------------------------------------------------------
+        # PARSE URL DATA
+        # ---------------------------------------------------------------------
+
+        path = url.path()
+        query_items = dict(url.queryItems())
+
+        login_attempt = "login_attempt" in query_items
+        skip_api_login = "skip_api_login" in query_items
+
+        error_reason = ""
+        if "error_reason" in query_items:
+            error_reason = query_items["error_reason"]
+
+        error_description = ""
+        if "error_description" in query_items:
+            error_description = query_items["error_description"]\
+                    .replace("+"," ")
+
+        state = ""
+        if "state" in query_items:
+            state = query_items["state"]
+
+        # ---------------------------------------------------------------------
+        # FIRE DESTINATION SIGNALS
+        # ---------------------------------------------------------------------
+
+        if path == "/login.php":
+            if skip_api_login:
+                # initial load of the login form
+                self.signal_authFormReady.emit(state)
+
+                return
+
+            elif login_attempt:
+                # user login credentials invalid
+                self.signal_authFail.emit(state)
+
+                return
+
+        elif path == "/connect/login_success.html":
+            if "error" in query_items:
+                # user canceled before granting permissions
+                self.signal_permsNotAuthorized.emit(query_items["error"],
+                        error_reason, error_description, state)
+
+                return
+
+
+        # print url details if no destination matched
+        print "URL Str: ", str(url)
+        print "URL Path: ", url.path()
+        print "Query Items: ", url.queryItems()
 
     # -------------------------------------------------------------------------
     # PUBLIC METHODS
@@ -252,17 +329,14 @@ class FBAuthDialog(QWebView):
 
     # -------------------------------------------------------------------------
 
-    def startAuth(self, show_self=True, state=None):
+    def startAuth(self, state=None):
         """
         Start authentication process by opening OAuth Dialog.
 
-        @param [show_self] (bool) If True the `show` method is called.
-        @param [state]     (str)  If set, the value is passed in the OAuth
-                                  request instead the value set for state using
-                                  the `set_oauth_params` method.
+        @param [state] (str) If set, the value is passed in the OAuth request
+                             instead the value set for state using the
+                             `set_oauth_params` method.
         """
-
-        print "START THE AUTH!!!"
 
         oauth_params = self.oauth_params.copy()
 
@@ -272,6 +346,3 @@ class FBAuthDialog(QWebView):
         oauth_url = self.get_oauth_url(**oauth_params)
 
         self.load(oauth_url)
-
-        if show_self:
-            self.show()

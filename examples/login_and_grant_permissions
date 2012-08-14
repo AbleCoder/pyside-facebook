@@ -20,6 +20,7 @@ FACEBOOK_APP_ID = "262499290528925"
 FACEBOOK_APP_SECRET = "967e45f9a62c29ad109ddfd359fc5cf3"
 
 
+import os
 import sys
 #from PySide.QtCore import *
 from PySide.QtGui import QApplication
@@ -27,8 +28,12 @@ from PySide.QtGui import QPushButton
 from PySide.QtGui import QWidget
 #from PySide.QtWebKit import QWebView
 
-from pyside_facebook import FBAuthDialog
+try:
+    from pyside_facebook import FBAuthDialog
+except ImportError:
+    sys.path.append(os.path.abspath(".."))
 
+    from pyside_facebook import FBAuthDialog
 
 class MainWindow(QWidget):
     def __init__(self, parent=None):
@@ -37,14 +42,42 @@ class MainWindow(QWidget):
         self.resize(800, 600)
         self.setWindowTitle('Log In & Grant Permissions')
 
-        self.fb_auth = FBAuthDialog(parent=self, app_id=FACEBOOK_APP_ID)
+        # create fb auth dialog view and connect signals and display
+        self.fb_auth = FBAuthDialog(parent=self)
+        self.fb_auth.set_oauth_params(app_id=FACEBOOK_APP_ID,
+                                      scope=['email','publish_stream'],
+                                      state="TESTLOGIN")
         self.fb_auth.resize(800, 500)
+        self.fb_auth.signal_authFail.connect(self._slot_authFail)
+        self.fb_auth.signal_authFormReady.connect(self._slot_authFormReady)
+        self.fb_auth.signal_authSuccessAccessToken.connect(self._slot_authSuccessAccessToken)
+        self.fb_auth.signal_permsNotAuthorized.connect(self._slot_permsNotAuthorized)
 
+        # create main app button, connect signals and display
         self.grant_button = QPushButton('Grant Facebook Permissions!', self)
         self.grant_button.resize(800, 90)
         self.grant_button.clicked.connect(self.grant_perms)
         self.grant_button.move(0, 510)
         self.grant_button.show()
+
+    def _slot_authFail(self, state):
+        print "_slot_authFail", state
+
+    def _slot_authFormReady(self, state):
+        print "_slot_authFormReady", state
+
+    def _slot_authSuccessAccessToken(self, access_token, expires_in, state):
+        print "_slot_authSuccessAccessToken"
+        print "access_token", access_token
+        print "expires_in", expires_in
+        print "state", state
+
+    def _slot_permsNotAuthorized(self, error, reason, description, state):
+        print "_slot_permsNotAuthorized"
+        print "error", error
+        print "reason", reason
+        print "description", description
+        print "state", state
 
     def grant_perms(self):
         print "This is where the facebook login should begin"
