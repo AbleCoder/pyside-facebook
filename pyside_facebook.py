@@ -19,7 +19,7 @@ from PySide.QtWebKit import QWebView
 # CONSTANTS
 # -----------------------------------------------------------------------------
 
-DEFAULT_REDIRECT_URI = "http://www.facebook.com/connect/login_success.html"
+REDIRECT_URI = "http://www.facebook.com/connect/login_success.html"
 OAUTH_URL = "https://graph.facebook.com/oauth/authorize"
 
 
@@ -211,7 +211,7 @@ class FBAuthDialog(QWebView):
 
     # -------------------------------------------------------------------------
 
-    def set_oauth_params(self, app_id=None, redirect_uri=DEFAULT_REDIRECT_URI,
+    def set_oauth_params(self, app_id=None, redirect_uri=REDIRECT_URI,
             scope=[], state=None, response_type="token", display="page"):
         """
         Set QAuth request params values.
@@ -221,6 +221,11 @@ class FBAuthDialog(QWebView):
 
         Facebook Permissions Reference
          - https://developers.facebook.com/docs/authentication/permissions/
+
+        NOTE: The default redirect_uri is the one provided by facebook
+              specifically to allow desktop apps to login using QAuth 2.0
+              implementation without having to have a webserver running to
+              redirect users to after they have successfully authenticated.
 
         @param (str/uni) [app_id]
         @param (str/uni) [redirect_uri]
@@ -232,7 +237,7 @@ class FBAuthDialog(QWebView):
 
         self.oauth_params = {
             "app_id": app_id,
-            "redirect_uri": DEFAULT_REDIRECT_URI,
+            "redirect_uri": REDIRECT_URI,
             "scope": scope,
             "state": state,
             "response_type": response_type,

@@ -4,10 +4,10 @@ import unittest
 from PySide.QtGui import QApplication
 from PySide.QtGui import QWidget
 
-from pyside_facebook import DEFAULT_REDIRECT_URI
 from pyside_facebook import FBAuthDialog
 from pyside_facebook import FBAuthDialogInvalidParamException
 from pyside_facebook import OAUTH_URL
+from pyside_facebook import REDIRECT_URI
 
 
 # -------------------------------------------------------------------------
@@ -16,7 +16,7 @@ from pyside_facebook import OAUTH_URL
 
 DEFAULT_OAUTH_PARAMS = {
     "app_id": None,
-    "redirect_uri": DEFAULT_REDIRECT_URI,
+    "redirect_uri": REDIRECT_URI,
     "scope": [],
     "state": None,
     "response_type": "token",
@@ -50,7 +50,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
     # -------------------------------------------------------------------------
 
     def helper_test_oauth_params(self, oauth_params, app_id=None,
-            redirect_uri=DEFAULT_REDIRECT_URI, scope=[], state=None,
+            redirect_uri=REDIRECT_URI, scope=[], state=None,
             response_type="token", display="page"):
         """
         Assert oauth_params dict matches kwarg values.
