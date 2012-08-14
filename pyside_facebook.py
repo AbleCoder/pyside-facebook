@@ -154,7 +154,7 @@ class FBAuthDialog(QWebView):
     # PUBLIC METHODS
     # -------------------------------------------------------------------------
 
-    def oauth_url(self, app_id, redirect_uri, scope, state, response_type,
+    def get_oauth_url(self, app_id, redirect_uri, scope, state, response_type,
             display):
         """
         Return encoded OAuth URL with request params formated as GET params.
@@ -252,14 +252,26 @@ class FBAuthDialog(QWebView):
 
     # -------------------------------------------------------------------------
 
-    def startAuth(self, show_view=True):
+    def startAuth(self, show_self=True, state=None):
         """
         Start authentication process by opening OAuth Dialog.
 
-        @param
+        @param [show_self] (bool) If True the `show` method is called.
+        @param [state]     (str)  If set, the value is passed in the OAuth
+                                  request instead the value set for state using
+                                  the `set_oauth_params` method.
         """
 
         print "START THE AUTH!!!"
 
-        self.load(loginUrl)
-        self.show()
+        oauth_params = self.oauth_params.copy()
+
+        if state:
+            oauth_params['state'] = state
+
+        oauth_url = self.get_oauth_url(**oauth_params)
+
+        self.load(oauth_url)
+
+        if show_self:
+            self.show()

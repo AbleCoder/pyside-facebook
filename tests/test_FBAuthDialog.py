@@ -111,7 +111,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
 
     # -------------------------------------------------------------------------
 
-    def test_oauth_url(self):
+    def test_get_oauth_url(self):
         # setup widget to run tests on
         fbad = FBAuthDialog(FBAuthDialogTestCase.parentWidget)
 
@@ -119,13 +119,13 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params = DEFAULT_OAUTH_PARAMS.copy()
 
         with self.assertRaises(FBAuthDialogInvalidParamException):
-            fbad.oauth_url(**oauth_params)
+            fbad.get_oauth_url(**oauth_params)
 
         # test default oauth_params
         oauth_params = DEFAULT_OAUTH_PARAMS.copy()
         oauth_params['app_id'] = "TEST_APP_ID"
 
-        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
@@ -139,7 +139,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params['app_id'] = "TEST_APP_ID-1"
         oauth_params['scope'] = ["test_perm1", "test_permABC"]
 
-        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID-1",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
@@ -152,7 +152,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params['app_id'] = "TEST_APP_ID-2"
         oauth_params['state'] = "test_state"
 
-        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID-2",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
@@ -166,7 +166,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params['scope'] = ["test_perm1", "test_permABC"]
         oauth_params['state'] = "test_state"
 
-        fbad_oauth_url = str(fbad.oauth_url(**oauth_params))
+        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID-3",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
