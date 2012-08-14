@@ -81,6 +81,17 @@ class FBAuthDialog(QWebView):
     # -------------------------------------------------------------------------
 
     """
+    Emitted when a user authentication succesfully before authorizing
+    permissions.
+
+    @param state (str) The state value originally set in request.
+    """
+
+    signal_authSuccess = Signal(str)
+
+    # -------------------------------------------------------------------------
+
+    """
     Emitted when the auth form has loaded and is ready to be displayed.
 
     @param state (str) The state value originally set in request.
@@ -99,7 +110,7 @@ class FBAuthDialog(QWebView):
     @param state        (str) The state value originally set in request.
     """
 
-    signal_authSuccessAccessToken = Signal(str, int, str)
+    signal_permsAuthorizedAccessToken = Signal(str, int, str)
 
     # -------------------------------------------------------------------------
 
@@ -111,7 +122,7 @@ class FBAuthDialog(QWebView):
     @param state      (str) The state value originally set in request.
     """
 
-    signal_authSuccessQAuthCode = Signal(str, str)
+    signal_permsAuthorizedOAuthCode = Signal(str, str)
 
     # -------------------------------------------------------------------------
 
@@ -177,20 +188,20 @@ class FBAuthDialog(QWebView):
         # PARSE URL DATA
         # ---------------------------------------------------------------------
 
+        fragment = url.fragment()
         path = url.path()
         query_items = dict(url.queryItems())
 
-        login_attempt = "login_attempt" in query_items
-        skip_api_login = "skip_api_login" in query_items
+        fragment_items = []
+        if fragment:
+            qu = QUrl()
+            qu.setEncodedQuery(str(fragment))
 
-        error_reason = ""
-        if "error_reason" in query_items:
-            error_reason = query_items["error_reason"]
+            fragment_items = qu.queryItems()
 
-        error_description = ""
-        if "error_description" in query_items:
-            error_description = query_items["error_description"]\
-                    .replace("+"," ")
+            # push fragment values into query items dict
+            for i in fragment_items:
+                query_items[i[0]] = i[1]
 
         state = ""
         if "state" in query_items:
@@ -200,32 +211,73 @@ class FBAuthDialog(QWebView):
         # FIRE DESTINATION SIGNALS
         # ---------------------------------------------------------------------
 
+        if "error" in query_items:
+            error_reason = ""
+            if "error_reason" in query_items:
+                reason = query_items["error_reason"]
+
+            error_description = ""
+            if "error_description" in query_items:
+                description = query_items["error_description"].replace("+"," ")
+
+            # user canceled before granting permissions
+            self.signal_permsNotAuthorized.emit(query_items["error"], reason,
+                    description, state)
+
+            return
+
         if path == "/login.php":
-            if skip_api_login:
+            if "skip_api_login" in query_items:
                 # initial load of the login form
                 self.signal_authFormReady.emit(state)
 
                 return
 
-            elif login_attempt:
+            elif "login_attempt" in query_items:
                 # user login credentials invalid
                 self.signal_authFail.emit(state)
 
                 return
 
-        elif path == "/connect/login_success.html":
-            if "error" in query_items:
-                # user canceled before granting permissions
-                self.signal_permsNotAuthorized.emit(query_items["error"],
-                        error_reason, error_description, state)
+        elif path == "/dialog/permissions.request":
+            if "from_login" in query_items:
+                # user authenticated successfully
+                self.signal_authSuccess.emit(state)
 
                 return
 
+        elif path == "/connect/login_success.html":
+            if "access_token" in query_items:
+                access_token = query_items["access_token"]
+
+                expires_in = 0
+                if "expires_in" in query_items:
+                    expires_in = int(query_items["expires_in"])
+
+                # permissions authorized and access token received
+                self.signal_permsAuthorizedAccessToken.emit(access_token,
+                        expires_in, state)
+
+                return
+
+            elif "code" in query_items:
+                oauth_code = query_items["code"]
+
+                expires_in = 0
+                if "expires_in" in query_items:
+                    expires_in = int(query_items["expires_in"])
+
+                # permissions authorized and OAuth code received
+                self.signal_permsAuthorizedOAuthCode.emit(oauth_code, state)
+
+                return
 
         # print url details if no destination matched
         print "URL Str: ", str(url)
-        print "URL Path: ", url.path()
-        print "Query Items: ", url.queryItems()
+        print "URL Path: ", path
+        print "Query Items: ", query_items
+        print "fragment: ", fragment
+        print "fragment_items: ", fragment_items
 
     # -------------------------------------------------------------------------
     # PUBLIC METHODS
@@ -297,7 +349,7 @@ class FBAuthDialog(QWebView):
     def set_oauth_params(self, app_id=None, redirect_uri=REDIRECT_URI,
             scope=[], state=None, response_type="token", display="popup"):
         """
-        Set QAuth request params values.
+        Set OAuth request params values.
 
         Facebook OAuth Dialog Param References:
          - https://developers.facebook.com/docs/reference/dialogs/oauth/
@@ -306,7 +358,7 @@ class FBAuthDialog(QWebView):
          - https://developers.facebook.com/docs/authentication/permissions/
 
         NOTE: The default redirect_uri is the one provided by facebook
-              specifically to allow desktop apps to login using QAuth 2.0
+              specifically to allow desktop apps to login using OAuth 2.0
               implementation without having to have a webserver running to
               redirect users to after they have successfully authenticated.
 

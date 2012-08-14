@@ -44,13 +44,13 @@ class MainWindow(QWidget):
 
         # create fb auth dialog view and connect signals and display
         self.fb_auth = FBAuthDialog(parent=self)
-        self.fb_auth.set_oauth_params(app_id=FACEBOOK_APP_ID,
-                                      scope=['email','publish_stream'],
-                                      state="TESTLOGIN")
+        self.fb_auth.set_oauth_params(app_id=FACEBOOK_APP_ID, scope=['email','publish_stream'], state="TESTLOGIN")
         self.fb_auth.resize(800, 500)
         self.fb_auth.signal_authFail.connect(self._slot_authFail)
         self.fb_auth.signal_authFormReady.connect(self._slot_authFormReady)
-        self.fb_auth.signal_authSuccessAccessToken.connect(self._slot_authSuccessAccessToken)
+        self.fb_auth.signal_authSuccess.connect(self._slot_authSuccess)
+        self.fb_auth.signal_permsAuthorizedAccessToken.connect(self._slot_permsAuthorizedAccessToken)
+        self.fb_auth.signal_permsAuthorizedOAuthCode.connect(self._slot_permsAuthorizedOAuthCode)
         self.fb_auth.signal_permsNotAuthorized.connect(self._slot_permsNotAuthorized)
 
         # create main app button, connect signals and display
@@ -66,10 +66,18 @@ class MainWindow(QWidget):
     def _slot_authFormReady(self, state):
         print "_slot_authFormReady", state
 
-    def _slot_authSuccessAccessToken(self, access_token, expires_in, state):
-        print "_slot_authSuccessAccessToken"
+    def _slot_authSuccess(self, state):
+        print "_slot_authSuccess", state
+
+    def _slot_permsAuthorizedAccessToken(self, access_token, expires_in, state):
+        print "_slot_permsAuthorizedAccessToken"
         print "access_token", access_token
         print "expires_in", expires_in
+        print "state", state
+
+    def _slot_permsAuthorizedOAuthCode(self, oauth_code, state):
+        print "_slot_permsAuthorizedOAuthCode"
+        print "oauth_code", oauth_code
         print "state", state
 
     def _slot_permsNotAuthorized(self, error, reason, description, state):
