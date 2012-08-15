@@ -102,6 +102,21 @@ class FBAuthDialog(QWebView):
     # -------------------------------------------------------------------------
 
     """
+    Emitted when an OAuthExeption is encountered.
+
+    NOTE: This is can happen for a multitude of reasons. For example if your
+          App ID is invalid you wil receive an OAuthEception code 101. You
+          should read the message for details on the cause of the exception.
+
+    @param message (str) A string explaining the exception.
+    @param code    (int) OAuthException code
+    """
+
+    signal_errorOAuthException = Signal(str, int)
+
+    # -------------------------------------------------------------------------
+
+    """
     Emitted when a user authenticates, authorizes the requested permissions
     AND the `response_type` was set to: token
 

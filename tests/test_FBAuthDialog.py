@@ -1,4 +1,5 @@
 import sys
+import time
 import unittest
 
 from PySide.QtGui import QApplication
@@ -10,9 +11,9 @@ from pyside_facebook import OAUTH_URL
 from pyside_facebook import REDIRECT_URI
 
 
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # CONSTANTS
-# -------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 DEFAULT_OAUTH_PARAMS = {
     "app_id": None,
@@ -21,6 +22,15 @@ DEFAULT_OAUTH_PARAMS = {
     "state": None,
     "response_type": "token",
     "display": "popup",
+}
+
+# -----------------------------------------------------------------------------
+
+FB_OAUTH_EXCEPTIONS = {
+    "INVALID_APP_ID": {
+        "code": 101,
+        "message": "Error validating application. Invalid application ID.",
+    },
 }
 
 
@@ -176,6 +186,55 @@ class FBAuthDialogTestCase(unittest.TestCase):
             "state=test_state"]))
 
         self.assertEqual(test_oauth_url, fbad_oauth_url)
+
+    # -------------------------------------------------------------------------
+
+    def test_startAuth(self):
+        # setup temp variables for validating correct singals until I can find
+        # a more generic and general method for confirming signal fires
+        _errorOAuthException_code = None
+        _errorOAuthException_message = None
+        _urlChanged_url = None
+
+        def slot_urlChanged(url):
+            _urlChanged_url = url
+
+        # create slot to confirm proper OAuthException error signal raised
+        def slot_errorOAuthException(message, code):
+            _errorOAuthException_message = message
+            _errorOAuthException_code = code
+
+        # setup widget to run tests with invalid app_id
+        fbad = FBAuthDialog(FBAuthDialogTestCase.parentWidget,
+                app_id="INVALID")
+
+        # connect signals to slots
+        fbad.urlChanged.connect(slot_urlChanged)
+        fbad.signal_errorOAuthException.connect(slot_errorOAuthException)
+
+        # ---------------------------------------------------------------------
+        # TESTS
+        # ---------------------------------------------------------------------
+
+        fbad.startAuth()
+
+        # wait for first urlChanged signal and then move onto tests
+        sleep_time_cur = 0
+        sleep_time_max = 10
+        sleep_time_step = 1
+        while _urlChanged_url is None:
+            if sleep_time_cur > sleep_time_max:
+                break
+
+            time.sleep(sleep_time_step)
+
+            sleep_time_cur += sleep_time_step
+
+        self.assertEqual(FB_OAUTH_EXCEPTIONS["INVALID_APP_ID"]["code"],
+                _errorOAuthException_code)
+        self.assertEqual(FB_OAUTH_EXCEPTIONS["INVALID_APP_ID"]["message"],
+                _errorOAuthException_message)
+
 
 if __name__ == '__main__':
     unittest.main()
