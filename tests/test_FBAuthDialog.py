@@ -20,7 +20,7 @@ DEFAULT_OAUTH_PARAMS = {
     "scope": [],
     "state": None,
     "response_type": "token",
-    "display": "page",
+    "display": "popup",
 }
 
 
@@ -51,7 +51,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
 
     def helper_test_oauth_params(self, oauth_params, app_id=None,
             redirect_uri=REDIRECT_URI, scope=[], state=None,
-            response_type="token", display="page"):
+            response_type="token", display="popup"):
         """
         Assert oauth_params dict matches kwarg values.
 
@@ -125,12 +125,12 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params = DEFAULT_OAUTH_PARAMS.copy()
         oauth_params['app_id'] = "TEST_APP_ID"
 
-        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
+        fbad_oauth_url = fbad.get_oauth_url(**oauth_params)
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
-            "display=page"]))
+            "display=popup"]))
 
         self.assertEqual(test_oauth_url, fbad_oauth_url)
 
@@ -139,12 +139,12 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params['app_id'] = "TEST_APP_ID-1"
         oauth_params['scope'] = ["test_perm1", "test_permABC"]
 
-        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
+        fbad_oauth_url = fbad.get_oauth_url(**oauth_params)
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID-1",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
-            "display=page",
+            "display=popup",
             "scope=test_perm1,test_permABC"]))
 
         # test default oauth_params w/ state
@@ -152,12 +152,12 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params['app_id'] = "TEST_APP_ID-2"
         oauth_params['state'] = "test_state"
 
-        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
+        fbad_oauth_url = fbad.get_oauth_url(**oauth_params)
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID-2",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
-            "display=page",
+            "display=popup",
             "state=test_state"]))
 
         # test default oauth_params w/ scope and state
@@ -166,12 +166,12 @@ class FBAuthDialogTestCase(unittest.TestCase):
         oauth_params['scope'] = ["test_perm1", "test_permABC"]
         oauth_params['state'] = "test_state"
 
-        fbad_oauth_url = str(fbad.get_oauth_url(**oauth_params))
+        fbad_oauth_url = fbad.get_oauth_url(**oauth_params)
         test_oauth_url = "%s?%s" % (OAUTH_URL, "&".join([
             "client_id=TEST_APP_ID-3",
             "redirect_uri=http://www.facebook.com/connect/login_success.html",
             "response_type=token",
-            "display=page",
+            "display=popup",
             "scope=test_perm1,test_permABC",
             "state=test_state"]))
 
