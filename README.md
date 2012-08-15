@@ -1,7 +1,7 @@
 pyside-facebook
 ===============
 
-[![Build Status](https://secure.travis-ci.org/AbleCoder/pyside-facebook].png)](http://travis-ci.org/AbleCoder/pyside-facebook)
+[![Build Status](https://secure.travis-ci.org/AbleCoder/pyside-facebook.png)](http://travis-ci.org/AbleCoder/pyside-facebook)
 
 A general purpose PySide library to interact with facebook's API.
 
