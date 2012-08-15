@@ -1,0 +1,72 @@
+ Original Login Page - Instantly Reloads To Next URL
+=====================================================
+PySide.QtCore.QUrl('https://www.facebook.com/dialog/permissions.request?app_id=262499290528925&display=popup&next=http://www.facebook.com/connect/login_success.html&response_type=token&fbconnect=1')
+Query Items:  [
+  (u'app_id', u'262499290528925'),
+  (u'display', u'popup'),
+  (u'next', u'http://www.facebook.com/connect/login_success.html'),
+  (u'response_type', u'token'),
+  (u'fbconnect', u'1')
+]
+
+
+ Actual Login Page - Ready to have a user log in
+=====================================================
+PySide.QtCore.QUrl('https://www.facebook.com/login.php?api_key=262499290528925&skip_api_login=1&display=popup&cancel_url=http://www.facebook.com/connect/login_success.html?error_reason=user_denied&error=access_denied&error_description=The+user+denied+your+request.&fbconnect=1&next=https://www.facebook.com/dialog/permissions.request?_path=permissions.request&app_id=262499290528925&redirect_uri=http%3A%2F%2Fwww.facebook.com%2Fconnect%2Flogin_success.html&display=popup&response_type=token&fbconnect=1&from_login=1&client_id=262499290528925&rcount=1')
+Query Items:  [
+  (u'api_key', u'262499290528925'),
+  (u'skip_api_login', u'1'),
+  (u'display', u'popup'),
+  (u'cancel_url', u'http://www.facebook.com/connect/login_success.html?error_reason=user_denied&error=access_denied&error_description=The+user+denied+your+request.'),
+  (u'fbconnect', u'1'),
+  (u'next', u'https://www.facebook.com/dialog/permissions.request?_path=permissions.request&app_id=262499290528925&redirect_uri=http%3A%2F%2Fwww.facebook.com%2Fconnect%2Flogin_success.html&display=popup&response_type=token&fbconnect=1&from_login=1&client_id=262499290528925'),
+  (u'rcount', u'1')
+]
+
+
+ Auth Failed - Bad Password
+===============================
+_slot_urlChanged PySide.QtCore.QUrl('https://www.facebook.com/login.php?login_attempt=1&popup=1&fbconnect=1&display=popup&next=https://www.facebook.com/dialog/permissions.request?_path=permissions.request&app_id=262499290528925&redirect_uri=http%3A%2F%2Fwww.facebook.com%2Fconnect%2Flogin_success.html&display=popup&response_type=token&fbconnect=1&from_login=1&client_id=262499290528925&legacy_return=1')
+Query Items:  [
+  (u'login_attempt', u'1'),
+  (u'popup', u'1'),
+  (u'fbconnect', u'1'),
+  (u'display', u'popup'),
+  (u'next', u'https://www.facebook.com/dialog/permissions.request?_path=permissions.request&app_id=262499290528925&redirect_uri=http%3A%2F%2Fwww.facebook.com%2Fconnect%2Flogin_success.html&display=popup&response_type=token&fbconnect=1&from_login=1&client_id=262499290528925'),
+  (u'legacy_return', u'1')
+]
+
+
+ Auth Successfully Logged - Showing Log In With App Page
+=============================================================
+_slot_urlChanged PySide.QtCore.QUrl('https://www.facebook.com/dialog/permissions.request?_path=permissions.request&app_id=262499290528925&redirect_uri=http://www.facebook.com/connect/login_success.html&display=popup&response_type=token&fbconnect=1&from_login=1&client_id=262499290528925')
+Query Items:  [
+  (u'_path', u'permissions.request'),
+  (u'app_id', u'262499290528925'),
+  (u'redirect_uri', u'http://www.facebook.com/connect/login_success.html'),
+  (u'display', u'popup'),
+  (u'response_type', u'token'),
+  (u'fbconnect', u'1'),
+  (u'from_login', u'1'),
+  (u'client_id', u'262499290528925')
+]
+
+
+
+Log In With App Successful - Showing Permissions Request Page
+===============================================================
+URL Str:  PySide.QtCore.QUrl('https://www.facebook.com/dialog/permissions.request?app_id=262499290528925&display=popup&next=http://www.facebook.com/connect/login_success.html&response_type=token&state=TESTLOGIN&perms=email,publish_stream&fbconnect=1')
+URL Path:  /dialog/permissions.request
+Query Items:  [
+  (u'app_id', u'262499290528925'),
+  (u'display', u'popup'),
+  (u'next', u'http://www.facebook.com/connect/login_success.html'),
+  (u'response_type', u'token'),
+  (u'state', u'TESTLOGIN'),
+  (u'perms', u'email,publish_stream'),
+  (u'fbconnect', u'1')
+]
+URL Str:  PySide.QtCore.QUrl('https://www.facebook.com/dialog/permissions.request')
+URL Path:  /dialog/permissions.request
+Query Items:  []
+
