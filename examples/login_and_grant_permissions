@@ -13,11 +13,12 @@ grants permissions to post access a user's primary email address.
 """
 
 
-FACEBOOK_APP_ID = "your app id"
-FACEBOOK_APP_SECRET = "your app secret"
-# TODO: REMOVE vv
-FACEBOOK_APP_ID = "262499290528925"
-FACEBOOK_APP_SECRET = "967e45f9a62c29ad109ddfd359fc5cf3"
+try:
+    # attempt to pull in settings from file
+    from fb_settings import *
+except:
+    FACEBOOK_APP_ID = "your app id"
+    FACEBOOK_APP_SECRET = "your app secret"
 
 
 import os
