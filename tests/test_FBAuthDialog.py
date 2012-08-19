@@ -216,7 +216,7 @@ class FBAuthDialogTestCase(unittest.TestCase):
         # TESTS
         # ---------------------------------------------------------------------
 
-        fbad.startAuth()
+        fbad.start_auth()
 
         # wait for first urlChanged signal and then move onto tests
         sleep_time_cur = 0

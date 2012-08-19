@@ -11,9 +11,10 @@
 A general purpose PySide library to interact with facebook's API.
 """
 
-from PySide.QtCore   import QUrl
-from PySide.QtCore   import Signal
-from PySide.QtWebKit import QWebView
+from PySide.QtCore    import QUrl
+from PySide.QtCore    import Signal
+from PySide.QtNetwork import QNetworkReply
+from PySide.QtWebKit  import QWebView
 
 # -----------------------------------------------------------------------------
 # CONSTANTS
@@ -185,19 +186,36 @@ class FBAuthDialog(QWebView):
         # calling the page() method makes DOM elements render correctly
         self.page()
 
+        self._nam = self.page().networkAccessManager()
+
         # connect signals
-        self.urlChanged.connect(self._slot_urlChanged)
+        #self.urlChanged.connect(self._slot_urlChanged)
+        self._nam.finished.connect(self._slot_httpResponseFinished)
 
     # -------------------------------------------------------------------------
     # INTERNAL METHODS
     # -------------------------------------------------------------------------
 
-    def _slot_urlChanged(self, url):
+    def _slot_httpResponseFinished(self, reply):
         """
-        Slot for QWebView urlChanged signal.
+        Slot for QWebView's QNetworkAccessManager finished signal.
 
-        @param url (QUrl)
+        @param reply (QNetworkReply)
         """
+
+        #print "REPLY::ERROR>> ", reply.error()
+        #print "REPLY::FINISHED>> ", self.url()
+
+        url = self.url()
+
+#    # -------------------------------------------------------------------------
+#
+#    def _slot_urlChanged(self, url):
+#        """
+#        Slot for QWebView urlChanged signal.
+#
+#        @param url (QUrl)
+#        """
 
         # ---------------------------------------------------------------------
         # PARSE URL DATA
@@ -396,7 +414,7 @@ class FBAuthDialog(QWebView):
 
     # -------------------------------------------------------------------------
 
-    def startAuth(self, state=None):
+    def start_auth(self, state=None):
         """
         Start authentication process by opening OAuth Dialog.
 

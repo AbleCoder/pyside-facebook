@@ -91,7 +91,7 @@ class MainWindow(QWidget):
     def grant_perms(self):
         print "This is where the facebook login should begin"
 
-        self.fb_auth.startAuth()
+        self.fb_auth.start_auth()
 
 
     def tempCameraCapture(self):
